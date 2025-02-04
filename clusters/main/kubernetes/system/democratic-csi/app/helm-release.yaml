@@ -1,0 +1,87 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: democratic-csi
+  namespace: democratic-csi
+spec:
+  releaseName: democratic-csi
+  interval: 5m
+  chart:
+    spec:
+      chart: democratic-csi
+      version: "*"
+      sourceRef:
+        kind: HelmRepository
+        name: democratic-csi
+        namespace: flux-system
+  values:
+    csiDriver:
+      # should be globally unique for a given cluster
+      name: "org.democratic-csi.nfs"
+      fsGroupPolicy: File
+
+    # add note here about volume expansion requirements
+    storageClasses:
+      - name: freenas-nfs-csi
+        defaultClass: true
+        reclaimPolicy: Delete
+        volumeBindingMode: Immediate
+        allowVolumeExpansion: true
+        parameters:
+          # for block-based storage can be ext3, ext4, xfs
+          # for nfs should be nfs
+          fsType: nfs
+
+          # if true, volumes created from other snapshots will be
+          # zfs send/received instead of zfs cloned
+          detachedVolumesFromSnapshots: "true"
+
+          # if true, volumes created from other volumes will be
+          # zfs send/received instead of zfs cloned
+          # detachedVolumesFromVolumes: "false"
+        mountOptions:
+          - noatime
+          - nfsvers=4
+        secrets:
+          provisioner-secret:
+          controller-publish-secret:
+          node-stage-secret:
+          node-publish-secret:
+          controller-expand-secret:
+
+    volumeSnapshotClasses:
+      - name: freenas-nfs-csi
+        parameters:
+          # if true, snapshots will be created with zfs send/receive
+          detachedSnapshots: "true"
+
+    driver:
+      config:
+        driver: freenas-api-nfs
+        instance_id: "k8s-cluster"
+        httpConnection:
+          protocol: https
+          host: "${TRUENAS_IP}"
+          port: 444
+          apiKey: "${TRUENAS_API_KEY}"
+          allowInsecure: true
+        zfs:
+          datasetProperties:
+            "org.freenas:description": "{{ parameters.[csi.storage.k8s.io/pvc/namespace] }}/{{ parameters.[csi.storage.k8s.io/pvc/name] }}"
+          datasetParentName: "tholos/k8s/volumes"
+          detachedSnapshotsDatasetParentName: "tholos/k8s/snapshots"
+          datasetEnableQuotas: true
+          datasetEnableReservation: false
+          datasetPermissionsMode: "0777"
+          datasetPermissionsUser: 0
+          datasetPermissionsGroup: 0
+        nfs:
+          shareCommentTemplate: "{{ parameters.[csi.storage.k8s.io/pvc/namespace] }}/{{ parameters.[csi.storage.k8s.io/pvc/name] }}"
+          shareHost: "${TRUENAS_IP}"
+          shareAlldirs: false
+          shareAllowedHosts: []
+          shareAllowedNetworks: []
+          shareMaprootUser: root
+          shareMaprootGroup: root
+          shareMapallUser: ""
+          shareMapallGroup: ""
