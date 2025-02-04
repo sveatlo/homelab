@@ -97,11 +97,21 @@ spec:
               # -- Trust every incoming connection
               insecureMode: false
     middlewares:
+      ipWhiteList:
+        - name: home
+          sourceRange:
+            - 10.69.0.0/16
       realIP:
         - name: real-ip
           excludedNetworks:
             - 172.16.0.0/16
             - 172.17.0.0/16
+      redirectRegex:
+        - name: traefik-regex
+          permanent: false
+          regex: //$
+          replacement: /dashboard/#/
+
     ingress:
       main:
         enabled: true
@@ -113,10 +123,7 @@ spec:
             middlewares:
               - name: traefik-regex
                 namespace: traefik
-              - name: auth
-                namespace: traefik
-            fixedMiddlewares:
-              - name: chain-basic
+              - name: home
                 namespace: traefik
           certManager:
             enabled: true
