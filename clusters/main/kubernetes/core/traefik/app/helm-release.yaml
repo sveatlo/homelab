@@ -125,6 +125,9 @@ spec:
                 namespace: traefik
               - name: home
                 namespace: traefik
+            fixedMiddlewares:
+              - name: chain-basic
+                namespace: traefik
           certManager:
             enabled: true
             certificateIssuer: domain-0-le-prod
