@@ -108,10 +108,9 @@ spec:
             - 172.17.0.0/16
       redirectRegex:
         - name: traefik-regex
-          permanent: false
-          regex: //$
-          replacement: /dashboard/#/
-
+          regex: "^/$"
+          replacement: "/dashboard/#"
+          permanent: true
     ingress:
       main:
         enabled: true
