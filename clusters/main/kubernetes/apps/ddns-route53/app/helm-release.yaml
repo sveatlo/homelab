@@ -1,0 +1,38 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: ddns-route53
+  namespace: ddns-route53
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: ddns-route53
+      version: 6.0.9
+      sourceRef:
+        kind: HelmRepository
+        name: truecharts
+        namespace: flux-system
+  releaseName: ddns-route53
+  values:
+    TZ: Europe/Prague
+    release_name: ddns-route53
+    resources: {}
+    workload:
+      main:
+        podSpec:
+          containers:
+            main:
+              env:
+                DDNSR53_CREDENTIALS_ACCESSKEYID: ${APP_DDNS_ROUTE53_ACCESS_KEY_ID}
+                DDNSR53_CREDENTIALS_SECRETACCESSKEY: ${APP_DDNS_ROUTE53_SECRET_ACCESS_KEY}
+                DDNSR53_ROUTE53_HOSTEDZONEID: ${APP_DDNS_ROUTE53_HOSTED_ZONE_ID}
+                DDNSR53_ROUTE53_RECORDSSET_0_NAME: "${DOMAIN_0}."
+                DDNSR53_ROUTE53_RECORDSSET_0_TTL: "300"
+                DDNSR53_ROUTE53_RECORDSSET_0_TYPE: A
+                LOG_JSON: "false"
+                LOG_LEVEL: info
+                MAX_RETRIES: "3"
+                SCHEDULE: "*/30 * * * *"
+        replicas: 1
+        type: Deployment
