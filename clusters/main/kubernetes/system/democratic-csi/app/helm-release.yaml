@@ -50,6 +50,9 @@ spec:
           controller-expand-secret:
 
     volumeSnapshotClasses:
+      # NOTE: the created snapshot class needs to be edited and this anotation needs to be added to make it the default
+      #     snapshot.storage.kubernetes.io/is-default-class: "true"
+      # Otherwise volsync will not work
       - name: freenas-nfs-csi
         parameters:
           # if true, snapshots will be created with zfs send/receive
