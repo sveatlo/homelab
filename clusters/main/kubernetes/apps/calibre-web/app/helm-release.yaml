@@ -1,19 +1,19 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: homepage
-  namespace: homepage
+  name: calibre-web
+  namespace: calibre-web
 spec:
   interval: 15m
   chart:
     spec:
-      chart: homepage
-      version: 8.0.9
+      chart: calibre-web
+      version: 19.0.13
       sourceRef:
         kind: HelmRepository
         name: truecharts
         namespace: flux-system
-  releaseName: homepage
+  releaseName: calibre-web
   values:
     TZ: Europe/Prague
     credentials:
@@ -25,23 +25,11 @@ spec:
         accessKey: ${S3_ACCESS_KEY}
         secretKey: ${S3_SECRET_KEY}
         encrKey: ${S3_ENCRYPTION_KEY}
-    persistence:
-      config:
-        enabled: true
-        mountPath: /app/config
-        volsync:
-          - credentials: backup
-            dest:
-              enabled: true
-            name: config
-            src:
-              enabled: true
-            type: restic
     ingress:
       main:
         enabled: true
         hosts:
-          - host: ${DOMAIN_0}
+          - host: calibre.${DOMAIN_0}
             paths:
               - path: /
                 pathType: Prefix
@@ -56,3 +44,21 @@ spec:
             middlewares:
               - name: auth
                 namespace: traefik
+    persistence:
+      config:
+        enabled: true
+        mountPath: /config
+        volsync:
+          - credentials: backup
+            dest:
+              enabled: true
+            name: config
+            src:
+              enabled: true
+            type: restic
+      media:
+        enabled: true
+        mountPath: /media
+        type: nfs
+        server: ${TRUENAS_IP}
+        path: /mnt/tholos/media

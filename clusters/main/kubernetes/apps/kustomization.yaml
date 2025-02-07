@@ -5,3 +5,4 @@ resources:
   - ddns-route53/ks.yaml
   - homepage/ks.yaml
   - calibre/ks.yaml
+  - calibre-web/ks.yaml
