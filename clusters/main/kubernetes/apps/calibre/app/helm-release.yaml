@@ -1,0 +1,63 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: calibre
+  namespace: calibre
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: calibre
+      version: 15.2.3
+      sourceRef:
+        kind: HelmRepository
+        name: truecharts
+        namespace: flux-system
+  releaseName: calibre
+  values:
+    TZ: Europe/Prague
+    credentials:
+      backup:
+        name: backup
+        type: s3
+        url: ${S3_URL_MINIO}
+        bucket: ${S3_BUCKET}
+        accessKey: ${S3_ACCESS_KEY}
+        secretKey: ${S3_SECRET_KEY}
+        encrKey: ${S3_ENCRYPTION_KEY}
+    persistence:
+      config:
+        enabled: true
+        mountPath: /config
+        volsync:
+          - credentials: backup
+            dest:
+              enabled: true
+            name: config
+            src:
+              enabled: true
+            type: restic
+      media:
+        enabled: true
+        mountPath: /media
+        type: nfs
+        server: ${TRUENAS_IP}
+        path: /mnt/tholos/media
+    service:
+      main:
+        enabled: true
+        ports:
+          main:
+            port: 8084
+            protocol: http
+            targetPort: 8080
+        type: LoadBalancer
+      webserver:
+        enabled: true
+        ports:
+          webserver:
+            enabled: true
+            port: 8081
+            protocol: http
+            targetPort: 8081
+        type: LoadBalancer

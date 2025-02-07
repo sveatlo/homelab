@@ -4,3 +4,4 @@ resources:
   - kubernetes-dashboard/ks.yaml
   - ddns-route53/ks.yaml
   - homepage/ks.yaml
+  - calibre/ks.yaml
