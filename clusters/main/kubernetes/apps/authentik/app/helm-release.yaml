@@ -1,0 +1,302 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: authentik
+  namespace: authentik
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: authentik
+      version: 26.1.8
+      sourceRef:
+        kind: HelmRepository
+        name: truecharts
+        namespace: flux-system
+  releaseName: authentik
+  values:
+    TZ: Europe/Prague
+    credentials:
+      backup:
+        name: backup
+        type: s3
+        url: ${BACKUP_S3_URL}
+        bucket: ${BACKUP_S3_BUCKET}
+        accessKey: ${BACKUP_S3_ACCESS_KEY}
+        secretKey: ${BACKUP_S3_SECRET_KEY}
+        encrKey: ${BACKUP_S3_ENCRYPTION_KEY}
+    cnpg:
+      main:
+        enabled: true
+        mode: standalone
+        database: authentik
+        user: authentik
+        password: ${APP_AUTHENTIK_CNPG_PASSWORD}
+        pgVersion: 16
+        backups:
+          credentials: backup
+          enabled: true
+          revision: "1"
+        recovery:
+          enabled: true
+          credentials: backup
+          revision: ""
+    authentik:
+      credentials:
+        bootstrapToken: ""
+        email: ${APP_AUTHENTIK_BOOTSTRAP_CREDENTIALS_USER}
+        password: ${APP_AUTHENTIK_BOOTSTRAP_CREDENTIALS_PASS}
+      email:
+        from: auth@${DOMAIN_0}
+        host: ${APP_AUTHENTIK_SMTP_HOST}
+        port: 587
+        username: ${APP_AUTHENTIK_SMTP_USER}
+        password: ${APP_AUTHENTIK_SMTP_PASS}
+        timeout: 10
+        useSSL: false
+        useTLS: true
+      general:
+        allowUserChangeEmail: true
+        allowUserChangeName: true
+        allowUserChangeUsername: true
+        avatars:
+          - gravatar
+          - initials
+        disableStartupAnalytics: true
+        disableUpdateCheck: false
+        footerLinks:
+          - href: https://${DOMAIN_0}
+            name: Mirkwood
+        gdprCompliance: true
+        impersonation: true
+        overwriteDefaultBlueprints: false
+        tokenLength: 128
+      outposts:
+        ldap:
+          enabled: true
+          token: ${APP_AUTHENTIK_OUTPOST_LDAP_TOKEN}
+        proxy:
+          enabled: false
+          token: ""
+        radius:
+          enabled: false
+          token: ""
+    ingress:
+      main:
+        enabled: true
+        hosts:
+          - host: auth.${DOMAIN_0}
+            paths:
+              - path: /
+                pathType: Prefix
+          - host: "*.${DOMAIN_0}"
+            paths:
+              - path: /outpost.goauthentik.io
+                pathType: Prefix
+        integrations:
+          certManager:
+            certificateIssuer: domain-0-le-prod
+            enabled: true
+          traefik:
+            enabled: true
+            entrypoints:
+              - websecure
+        required: true
+      proxy:
+        enabled: false
+    persistence:
+      blueprints:
+        enabled: true
+        readOnly: false
+        storageClass: ""
+        targetSelector:
+          worker:
+            worker:
+              mountPath: /blueprints/custom
+        volsync:
+          - credentials: backup
+            dest:
+              enabled: true
+            name: media
+            src:
+              enabled: true
+            type: restic
+      certs:
+        enabled: true
+        mountPath: /certs
+        readOnly: false
+        storageClass: ""
+        targetSelector:
+          worker:
+            worker:
+              mountPath: /certs
+        volsync:
+          - credentials: backup
+            dest:
+              enabled: true
+            name: media
+            src:
+              enabled: true
+            type: restic
+      geoip:
+        enabled: true
+        readOnly: false
+        storageClass: ""
+        targetSelector:
+          geoip:
+            geoip:
+              mountPath: /usr/share/GeoIP
+          main:
+            main:
+              mountPath: /geoip
+          worker:
+            worker:
+              mountPath: /geoip
+        volsync:
+          - credentials: backup
+            dest:
+              enabled: true
+            name: geoip
+            src:
+              enabled: true
+            type: restic
+      media:
+        enabled: true
+        readOnly: false
+        storageClass: ""
+        targetSelector:
+          main:
+            main:
+              mountPath: /media
+          worker:
+            worker:
+              mountPath: /media
+        volsync:
+          - credentials: backup
+            dest:
+              enabled: true
+            name: media
+            src:
+              enabled: true
+            type: restic
+      templates:
+        enabled: true
+        readOnly: false
+        storageClass: ""
+        targetSelector:
+          main:
+            main:
+              mountPath: /templates
+          worker:
+            worker:
+              mountPath: /templates
+        volsync:
+          - credentials: backup
+            dest:
+              enabled: true
+            name: templates
+            src:
+              enabled: true
+            type: restic
+    service:
+      http:
+        enabled: true
+        ports:
+          http:
+            enabled: true
+            port: 10230
+            protocol: http
+        type: ClusterIP
+      ldap:
+        enabled: true
+        loadBalancerIP: ""
+        ports:
+          ldap:
+            enabled: true
+            port: 389
+            targetSelector: ldap
+        targetSelector: ldap
+        type: LoadBalancer
+      ldapmetrics:
+        enabled: true
+        ports:
+          ldapmetrics:
+            enabled: true
+            port: 10233
+            protocol: http
+            targetSelector: ldap
+        targetSelector: ldap
+        type: ClusterIP
+      ldaps:
+        enabled: true
+        loadBalancerIP: ""
+        ports:
+          ldaps:
+            enabled: true
+            port: 636
+            targetSelector: ldap
+        targetSelector: ldap
+        type: LoadBalancer
+      main:
+        enabled: true
+        loadBalancerIP: ""
+        ports:
+          main:
+            port: 10229
+            protocol: https
+        type: LoadBalancer
+      proxy:
+        enabled: true
+        loadBalancerIP: ""
+        ports:
+          http:
+            enabled: true
+            port: 10227
+            protocol: http
+            targetSelector: proxy
+          https:
+            enabled: true
+            port: 10228
+            protocol: https
+            targetSelector: proxy
+        targetSelector: proxy
+        type: LoadBalancer
+      proxymetrics:
+        enabled: true
+        ports:
+          proxymetrics:
+            enabled: true
+            port: 10234
+            protocol: http
+            targetSelector: proxy
+        targetSelector: proxy
+        type: ClusterIP
+      radius:
+        enabled: true
+        loadBalancerIP: ""
+        ports:
+          radius:
+            enabled: true
+            port: 1812
+            protocol: udp
+            targetSelector: radius
+        targetSelector: radius
+        type: LoadBalancer
+      radiusmetrics:
+        enabled: true
+        ports:
+          radiusmetrics:
+            enabled: true
+            port: 10232
+            protocol: http
+            targetSelector: radius
+        targetSelector: radius
+        type: ClusterIP
+      servermetrics:
+        enabled: true
+        ports:
+          servermetrics:
+            enabled: true
+            port: 10231
+            protocol: http
+        type: ClusterIP
