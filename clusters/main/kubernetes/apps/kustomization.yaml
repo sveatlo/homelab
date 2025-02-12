@@ -6,3 +6,4 @@ resources:
   - homepage/ks.yaml
   - calibre/ks.yaml
   - calibre-web/ks.yaml
+  - mealie/ks.yaml

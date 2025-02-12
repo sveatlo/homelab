@@ -1,0 +1,145 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: mealie
+  namespace: mealie
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: mealie
+      version: 22.2.2
+      sourceRef:
+        kind: HelmRepository
+        name: truecharts
+        namespace: flux-system
+  releaseName: mealie
+  values:
+    TZ: Europe/Prague
+    credentials:
+      backup:
+        name: backup
+        type: s3
+        url: ${BACKUP_S3_URL}
+        bucket: ${BACKUP_S3_BUCKET}
+        accessKey: ${BACKUP_S3_ACCESS_KEY}
+        secretKey: ${BACKUP_S3_SECRET_KEY}
+        encrKey: ${BACKUP_S3_ENCRYPTION_KEY}
+    cnpg:
+      main:
+        enabled: true
+        mode: standalone
+        database: mealie
+        user: mealie
+        password: ${APP_MEALIE_CNPG_PASSWORD}
+        backups:
+          enabled: true
+          credentials: backup
+          retentionPolicy: ""
+          revision: "1"
+        recovery:
+          enabled: true
+          credentials: backup
+          revision: ""
+        pgVersion: 16
+    ingress:
+      main:
+        enabled: true
+        hosts:
+          - host: recipes.${DOMAIN_0}
+            paths:
+              - path: /
+                pathType: Prefix
+        integrations:
+          certManager:
+            certificateIssuer: domain-0-le-prod
+            enabled: true
+          traefik:
+            enabled: true
+            entrypoints:
+              - websecure
+    mealie:
+      api:
+        general:
+          allow_signup: false
+          base_url: https://recipes.${DOMAIN_0}
+          default_group: Home
+          token_time: 48
+        oidc:
+          admin_group: ""
+          auth_enabled: true
+          client_id: ${APP_MEALIE_OIDC_CLIENT_ID}
+          configuration_url: https://auth.${DOMAIN_0}/application/o/mealie/.well-known/openid-configuration
+          provider_name: Mirkwood Auth
+          remember_me: true
+          signup_enabled: true
+          user_group: ""
+        security:
+          max_login_attempts: 5
+          user_lockout_time: 24
+        smtp:
+          auth_strategy: TLS
+          from_email: recipes@${DOMAIN_0}
+          from_name: Mealie Recipes
+          host: ${APP_MEALIE_SMTP_HOST}
+          port: 587
+          user: ${APP_MEALIE_SMTP_USER}
+          password: ${APP_MEALIE_SMTP_PASS}
+    persistence:
+      data:
+        enabled: true
+        readOnly: false
+        storageClass: ""
+        targetSelector:
+          main:
+            main:
+              mountPath: /app/data
+        volsync:
+          - credentials: backup
+            dest:
+              enabled: true
+            name: app-data
+            src:
+              enabled: true
+            type: restic
+    workload:
+      main:
+        podSpec:
+          containers:
+            main:
+              env:
+                OIDC_ADMIN_GROUP: superadmins
+                OIDC_AUTH_ENABLED: "true"
+                OIDC_AUTO_REDIRECT: "true"
+                OIDC_CLIENT_ID: ${APP_MEALIE_OIDC_CLIENT_ID}
+                OIDC_CONFIGURATION_URL: https://auth.${DOMAIN_0}/application/o/mealie/.well-known/openid-configuration
+                OIDC_PROVIDER_NAME: Mirkwood Auth
+                OIDC_REMEMBER_ME: "true"
+                OIDC_SIGNUP_ENABLED: "true"
+                OIDC_USER_CLAIM: preferred_username
+              envFrom:
+                - secretRef:
+                    name: frontend
+                - secretRef:
+                    name: api
+              probes:
+                liveness:
+                  command:
+                    - python
+                    - /app/mealie/scripts/healthcheck.py
+                  enabled: true
+                  type: exec
+                readiness:
+                  command:
+                    - python
+                    - /app/mealie/scripts/healthcheck.py
+                  enabled: true
+                  type: exec
+                startup:
+                  command:
+                    - python
+                    - /app/mealie/scripts/healthcheck.py
+                  enabled: true
+                  type: exec
+        replicas: 1
+        type: Deployment
