@@ -9,3 +9,4 @@ resources:
   - mealie/ks.yaml
   - authentik/ks.yaml
   - paperless-ngx/ks.yaml
+  - babybuddy/ks.yaml
