@@ -103,7 +103,8 @@ spec:
             - 10.69.0.0/16
       forwardAuth:
         - name: auth
-          address: https://authentik-http.authentik.svc.cluster.local:10230/outpost.goauthentik.io/auth/traefik
+          # address: https://authentik-http.authentik.svc.cluster.local:10230/outpost.goauthentik.io/auth/traefik
+          address: https://auth.mirkwood.casa/outpost.goauthentik.io/auth/traefik
           authRequestHeaders: []
           authResponseHeaders:
             - X-authentik-username
@@ -117,7 +118,7 @@ spec:
             - X-authentik-meta-provider
             - X-authentik-meta-app
             - X-authentik-meta-version
-          authResponseHeadersRegex: ""
+            - Authorization
           tls:
             insecureSkipVerify: true
           trustForwardHeader: true
