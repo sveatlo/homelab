@@ -1,0 +1,103 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: paperless-ngx
+  namespace: paperless-ngx
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: paperless-ngx
+      version: 8.2.12
+      sourceRef:
+        kind: HelmRepository
+        name: truecharts
+        namespace: flux-system
+  releaseName: paperless-ngx
+  values:
+    TZ: Europe/Prague
+    credentials:
+      backup:
+        name: backup
+        type: s3
+        url: ${BACKUP_S3_URL}
+        bucket: ${BACKUP_S3_BUCKET}
+        accessKey: ${BACKUP_S3_ACCESS_KEY}
+        secretKey: ${BACKUP_S3_SECRET_KEY}
+        encrKey: ${BACKUP_S3_ENCRYPTION_KEY}
+    cnpg:
+      main:
+        enabled: true
+        # mode: standalone
+        mode: recovery
+        database: paperless-ng
+        user: paperless-ng
+        password: ${APP_PAPERLESS_CNPG_PASSWORD}
+        pgVersion: 16
+        backups:
+          enabled: true
+          credentials: backup
+          revision: "1"
+        recovery:
+          enabled: true
+          credentials: backup
+          revision: ""
+    ingress:
+      main:
+        enabled: true
+        hosts:
+          - host: docs.${DOMAIN_0}
+            paths:
+              - path: /
+                pathType: Prefix
+        integrations:
+          certManager:
+            certificateIssuer: domain-0-le-prod
+            enabled: true
+          traefik:
+            enabled: true
+            entrypoints:
+              - websecure
+    persistence:
+      consume:
+        enabled: true
+        mountPath: /consume
+      data:
+        enabled: true
+        mountPath: /data
+        volsync:
+          - type: restic
+            credentials: backup
+            name: data
+            dest:
+              enabled: true
+            src:
+              enabled: true
+      media:
+        enabled: true
+        mountPath: /media
+        volsync:
+          - type: restic
+            credentials: backup
+            name: media
+            dest:
+              enabled: true
+            src:
+              enabled: true
+    workload:
+      main:
+        podSpec:
+          containers:
+            main:
+              env:
+                PAPERLESS_URL: https://docs.${DOMAIN_0}
+                PAPERLESS_ADMIN_USER: ${APP_PAPERLESS_ADMIN_PASS}
+                PAPERLESS_ADMIN_PASSWORD: ${APP_PAPERLESS_ADMIN_PASS}
+                PAPERLESS_ADMIN_MAIL: ${APP_PAPERLESS_ADMIN_MAIL}
+                PAPERLESS_CONSUMER_POLLING: "120"
+                PAPERLESS_OCR_LANGUAGE: ces+slk+eng
+                PAPERLESS_OCR_LANGUAGES: ces slk eng spa
+                PAPERLESS_OCR_USER_ARGS: '{"invalidate_digital_signatures": true}'
+                PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
+                PAPERLESS_DISABLE_REGULAR_LOGIN: "true"
+                PAPERLESS_SOCIALACCOUNT_PROVIDERS: '{ "openid_connect": { "APPS": [ { "provider_id": "authentik", "name": "Mirkwood Auth", "client_id": "${APP_PAPERLESS_OIDC_CLIENT_ID}", "secret": "${APP_PAPERLESS_OIDC_CLIENT_SECRET}", "settings": { "server_url": "https://auth.${DOMAIN_0}/application/o/paperless/.well-known/openid-configuration" } } ], "OAUTH_PKCE_ENABLED": "True" } }'

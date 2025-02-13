@@ -8,3 +8,4 @@ resources:
   - calibre-web/ks.yaml
   - mealie/ks.yaml
   - authentik/ks.yaml
+  - paperless-ngx/ks.yaml
