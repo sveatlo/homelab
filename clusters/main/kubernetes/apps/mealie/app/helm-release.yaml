@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: mealie
-      version: 22.2.2
+      version: 24.7.0
       sourceRef:
         kind: HelmRepository
         name: truecharts
@@ -108,38 +108,4 @@ spec:
           containers:
             main:
               env:
-                OIDC_ADMIN_GROUP: superadmins
-                OIDC_AUTH_ENABLED: "true"
-                OIDC_AUTO_REDIRECT: "true"
-                OIDC_CLIENT_ID: ${APP_MEALIE_OIDC_CLIENT_ID}
-                OIDC_CONFIGURATION_URL: https://auth.${DOMAIN_0}/application/o/mealie/.well-known/openid-configuration
-                OIDC_PROVIDER_NAME: Mirkwood Auth
-                OIDC_REMEMBER_ME: "true"
-                OIDC_SIGNUP_ENABLED: "true"
-                OIDC_USER_CLAIM: preferred_username
-              envFrom:
-                - secretRef:
-                    name: frontend
-                - secretRef:
-                    name: api
-              probes:
-                liveness:
-                  command:
-                    - python
-                    - /app/mealie/scripts/healthcheck.py
-                  enabled: true
-                  type: exec
-                readiness:
-                  command:
-                    - python
-                    - /app/mealie/scripts/healthcheck.py
-                  enabled: true
-                  type: exec
-                startup:
-                  command:
-                    - python
-                    - /app/mealie/scripts/healthcheck.py
-                  enabled: true
-                  type: exec
-        replicas: 1
-        type: Deployment
+                OIDC_CLIENT_SECRET: ${APP_MEALIE_OIDC_CLIENT_SECRET}
