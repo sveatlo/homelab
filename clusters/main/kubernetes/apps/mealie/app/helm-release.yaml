@@ -109,3 +109,4 @@ spec:
             main:
               env:
                 OIDC_CLIENT_SECRET: ${APP_MEALIE_OIDC_CLIENT_SECRET}
+                OPENAI_API_KEY: ${APP_MEALIE_OPENAI_API_KEY}
