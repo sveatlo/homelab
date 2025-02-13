@@ -102,7 +102,8 @@ spec:
           sourceRange:
             - 10.69.0.0/16
       forwardAuth:
-        - address: https://authentik-http.authentik.svc.cluster.local:10230/outpost.goauthentik.io/auth/traefik
+        - name: auth
+          address: https://authentik-http.authentik.svc.cluster.local:10230/outpost.goauthentik.io/auth/traefik
           authRequestHeaders: []
           authResponseHeaders:
             - X-authentik-username
@@ -117,7 +118,6 @@ spec:
             - X-authentik-meta-app
             - X-authentik-meta-version
           authResponseHeadersRegex: ""
-          name: auth
           tls:
             insecureSkipVerify: true
           trustForwardHeader: true
