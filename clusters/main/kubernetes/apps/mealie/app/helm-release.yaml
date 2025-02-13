@@ -66,14 +66,14 @@ spec:
           default_group: Home
           token_time: 48
         oidc:
-          admin_group: ""
-          auth_enabled: true
-          client_id: ${APP_MEALIE_OIDC_CLIENT_ID}
-          configuration_url: https://auth.${DOMAIN_0}/application/o/mealie/.well-known/openid-configuration
           provider_name: Mirkwood Auth
+          auth_enabled: true
           remember_me: true
           signup_enabled: true
-          user_group: ""
+          admin_group: "superadmins"
+          user_group: "app_mealie"
+          client_id: ${APP_MEALIE_OIDC_CLIENT_ID}
+          configuration_url: https://auth.${DOMAIN_0}/application/o/mealie/.well-known/openid-configuration
         security:
           max_login_attempts: 5
           user_lockout_time: 24
