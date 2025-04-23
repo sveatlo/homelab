@@ -1,0 +1,70 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: radarr
+  namespace: radarr
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: radarr
+      version: 23.24.0
+      sourceRef:
+        kind: HelmRepository
+        name: truecharts
+        namespace: flux-system
+      interval: 15m
+  values:
+    credentials:
+      backup:
+        name: backup
+        type: s3
+        url: ${BACKUP_S3_URL}
+        bucket: ${BACKUP_S3_BUCKET}
+        accessKey: ${BACKUP_S3_ACCESS_KEY}
+        secretKey: ${BACKUP_S3_SECRET_KEY}
+        encrKey: ${BACKUP_S3_ENCRYPTION_KEY}
+    metrics:
+      main:
+        enabled: false
+    workload:
+      exportarr:
+        enabled: false
+
+    ingress:
+      main:
+        enabled: true
+        hosts:
+          - host: radarr.${DOMAIN_0}
+            paths:
+              - path: /
+                pathType: Prefix
+        integrations:
+          certManager:
+            certificateIssuer: domain-0-le-prod
+            enabled: true
+          traefik:
+            enabled: true
+            entrypoints:
+              - websecure
+            middlewares:
+              - name: home
+                namespace: traefik
+    persistence:
+      config:
+        volsync:
+          - name: config
+            type: restic
+            credentials: backup
+            dest:
+              enabled: true
+            src:
+              enabled: true
+      media:
+        enabled: true
+        mountPath: /media
+        type: nfs
+        server: ${TRUENAS_IP}
+        path: /mnt/tholos/media

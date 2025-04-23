@@ -5,3 +5,4 @@ resources:
   - qbittorrent/ks.yaml
   - flaresolverr/ks.yaml
   - prowlarr/ks.yaml
+  - radarr/ks.yaml
