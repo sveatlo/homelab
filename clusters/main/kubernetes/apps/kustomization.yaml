@@ -10,3 +10,4 @@ resources:
   - authentik/ks.yaml
   - paperless-ngx/ks.yaml
   - babybuddy/ks.yaml
+  - media
