@@ -10,3 +10,4 @@ resources:
   - readarr/ks.yaml
   - bazarr/ks.yaml
   - lidarr/ks.yaml
+  - audiobookshelf/ks.yaml
