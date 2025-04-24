@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - external-service-truenas/ks.yaml
   - external-service-home-assistant/ks.yaml
+  - external-service-jellyfin/ks.yaml
