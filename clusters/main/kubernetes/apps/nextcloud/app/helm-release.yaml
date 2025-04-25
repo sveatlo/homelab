@@ -1,0 +1,105 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: nextcloud
+  namespace: nextcloud
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: nextcloud
+      version: 33.1.4
+      sourceRef:
+        kind: HelmRepository
+        name: truecharts
+        namespace: flux-system
+      interval: 5m
+  values:
+    credentials:
+      backup:
+        name: backup
+        type: s3
+        url: ${BACKUP_S3_URL}
+        bucket: ${BACKUP_S3_BUCKET}
+        accessKey: ${BACKUP_S3_ACCESS_KEY}
+        secretKey: ${BACKUP_S3_SECRET_KEY}
+        encrKey: ${BACKUP_S3_ENCRYPTION_KEY}
+    ingress:
+      main:
+        enabled: true
+        hosts:
+          - host: nextcloud.${DOMAIN_0}
+            paths:
+              - path: /
+                pathType: Prefix
+        integrations:
+          certManager:
+            certificateIssuer: domain-0-le-prod
+            enabled: true
+          traefik:
+            enabled: true
+            entrypoints:
+              - websecure
+            middlewares:
+              - name: home
+                namespace: traefik
+    cnpg:
+      main:
+        enabled: true
+        mode: standalone
+        database: nextcloud
+        user: nextcloud
+        password: ${APP_NEXTCLOUD_CNPG_PASSWORD}
+        backups:
+          enabled: true
+          credentials: backup
+          retentionPolicy: ""
+          revision: "1"
+        recovery:
+          enabled: true
+          credentials: backup
+          revision: ""
+        pgVersion: 16
+    persistence:
+      data:
+        enabled: true
+        type: nfs
+        path: ${APP_NEXTCLOUD_NFS_SHARE}
+        server: ${TRUENAS_IP}
+        targetSelector:
+          main:
+            main:
+              mountPath: /var/www/html/data
+            init-perms:
+              mountPath: /var/www/html/data
+          nextcloud-cron:
+            nextcloud-cron:
+              mountPath: /var/www/html/data
+          preview-cron:
+            preview-cron:
+              mountPath: /var/www/html/data
+          nginx:
+            nginx:
+              mountPath: /var/www/html/data
+              readOnly: true
+    nextcloud:
+      collabora:
+        enabled: false
+      credentials:
+        initialAdminUser: "${APP_NEXTCLOUD_ADMIN_USER}"
+        initialAdminPassword: "${APP_NEXTCLOUD_ADMIN_PASSWORD}"
+      general:
+        accessIP: ${TRAEFIK_IP}
+        default_phone_region: CZ
+      previews:
+        providers:
+          - BMP
+          - GIF
+          - JPEG
+          - Krita
+          - MarkDown
+          - MP3
+          - OpenDocument
+          - PNG
+          - TXT
+          - XBitmap

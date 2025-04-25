@@ -11,3 +11,4 @@ resources:
   - paperless-ngx/ks.yaml
   - babybuddy/ks.yaml
   - media
+  - nextcloud/ks.yaml
