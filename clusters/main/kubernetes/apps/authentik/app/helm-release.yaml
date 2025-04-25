@@ -209,7 +209,7 @@ spec:
         type: ClusterIP
       ldap:
         enabled: true
-        loadBalancerIP: ""
+        loadBalancerIP: "${LDAP_IP}"
         ports:
           ldap:
             enabled: true
@@ -229,7 +229,7 @@ spec:
         type: ClusterIP
       ldaps:
         enabled: true
-        loadBalancerIP: ""
+        loadBalancerIP: "${LDAP_IP}"
         ports:
           ldaps:
             enabled: true
