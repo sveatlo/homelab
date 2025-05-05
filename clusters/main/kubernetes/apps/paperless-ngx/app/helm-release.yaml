@@ -28,8 +28,7 @@ spec:
     cnpg:
       main:
         enabled: true
-        # mode: standalone
-        mode: recovery
+        mode: standalone
         database: paperless-ng
         user: paperless-ng
         password: ${APP_PAPERLESS_CNPG_PASSWORD}
@@ -37,11 +36,11 @@ spec:
         backups:
           enabled: true
           credentials: backup
-          revision: "1"
+          revision: "2"
         recovery:
           enabled: true
           credentials: backup
-          revision: ""
+          revision: "1"
     ingress:
       main:
         enabled: true
