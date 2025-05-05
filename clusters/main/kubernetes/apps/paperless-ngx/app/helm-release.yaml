@@ -91,7 +91,7 @@ spec:
             main:
               env:
                 PAPERLESS_URL: https://docs.${DOMAIN_0}
-                PAPERLESS_ADMIN_USER: ${APP_PAPERLESS_ADMIN_PASS}
+                PAPERLESS_ADMIN_USER: ${APP_PAPERLESS_ADMIN_USER}
                 PAPERLESS_ADMIN_PASSWORD: ${APP_PAPERLESS_ADMIN_PASS}
                 PAPERLESS_ADMIN_MAIL: ${APP_PAPERLESS_ADMIN_MAIL}
                 PAPERLESS_CONSUMER_POLLING: "120"
