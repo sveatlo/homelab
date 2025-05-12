@@ -12,3 +12,4 @@ resources:
   - lidarr/ks.yaml
   - audiobookshelf/ks.yaml
   - jellystat/ks.yaml
+  - jellyseerr/ks.yaml

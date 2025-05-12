@@ -1,0 +1,56 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: jellyseerr
+  namespace: jellyseerr
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: jellyseerr
+      version: 12.7.3
+      sourceRef:
+        kind: HelmRepository
+        name: truecharts
+        namespace: flux-system
+      interval: 15m
+  values:
+    credentials:
+      backup:
+        name: backup
+        type: s3
+        url: ${BACKUP_S3_URL}
+        bucket: ${BACKUP_S3_BUCKET}
+        accessKey: ${BACKUP_S3_ACCESS_KEY}
+        secretKey: ${BACKUP_S3_SECRET_KEY}
+        encrKey: ${BACKUP_S3_ENCRYPTION_KEY}
+
+    ingress:
+      main:
+        enabled: true
+        hosts:
+          - host: jellyseerr.${DOMAIN_0}
+            paths:
+              - path: /
+                pathType: Prefix
+        integrations:
+          certManager:
+            certificateIssuer: domain-0-le-prod
+            enabled: true
+          traefik:
+            enabled: true
+            entrypoints:
+              - websecure
+
+    persistence:
+      config:
+        volsync:
+          - name: config
+            type: restic
+            credentials: backup
+            dest:
+              enabled: true
+            src:
+              enabled: true
