@@ -40,9 +40,6 @@ spec:
             enabled: true
             entrypoints:
               - websecure
-            middlewares:
-              - name: home
-                namespace: traefik
     cnpg:
       main:
         enabled: true
@@ -83,8 +80,6 @@ spec:
               mountPath: /var/www/html/data
               readOnly: true
     nextcloud:
-      collabora:
-        enabled: false
       credentials:
         initialAdminUser: "${APP_NEXTCLOUD_ADMIN_USER}"
         initialAdminPassword: "${APP_NEXTCLOUD_ADMIN_PASSWORD}"
@@ -103,3 +98,23 @@ spec:
           - PNG
           - TXT
           - XBitmap
+      clamav:
+        enabled: true
+        stream_max_length: 26214400
+        file_max_size: -1
+        infected_action: only_log
+      notify_push:
+        enabled: true
+      collabora:
+        enabled: true
+        interface_mode: default
+        username: "${APP_NEXTCLOUD_COLLABORA_USERNAME}"
+        password: "${APP_NEXTCLOUD_COLLABORA_PASSWORD}"
+        dictionaries:
+          - cs_CZ
+          - sk_SK
+          - en_GB
+          - en_US
+          - es_ES
+          - de_DE
+          - fr_FR
