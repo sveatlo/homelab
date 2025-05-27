@@ -51,7 +51,7 @@ spec:
     cnpg:
       main:
         enabled: true
-        mode: recovery
+        mode: standalone
         user: babybuddy
         database: babybuddy
         password: ${APP_BABYBUDDY_CNPG_PASSWORD}
