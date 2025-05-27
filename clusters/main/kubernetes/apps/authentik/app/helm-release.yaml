@@ -28,7 +28,7 @@ spec:
     cnpg:
       main:
         enabled: true
-        mode: standalone
+        mode: recovery
         database: authentik
         user: authentik
         password: ${APP_AUTHENTIK_CNPG_PASSWORD}
@@ -36,11 +36,11 @@ spec:
         backups:
           credentials: backup
           enabled: true
-          revision: "1"
+          revision: "2"
         recovery:
           enabled: true
           credentials: backup
-          revision: ""
+          revision: "1"
     authentik:
       credentials:
         bootstrapToken: ""
