@@ -28,7 +28,7 @@ spec:
     cnpg:
       main:
         enabled: true
-        mode: standalone
+        mode: recovery
         database: mealie
         user: mealie
         password: ${APP_MEALIE_CNPG_PASSWORD}
@@ -36,11 +36,11 @@ spec:
           enabled: true
           credentials: backup
           retentionPolicy: ""
-          revision: "1"
+          revision: "2"
         recovery:
           enabled: true
           credentials: backup
-          revision: ""
+          revision: "1"
         pgVersion: 16
     ingress:
       main:
