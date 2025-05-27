@@ -28,7 +28,7 @@ spec:
     cnpg:
       main:
         enabled: true
-        mode: recovery
+        mode: standalone
         database: authentik
         user: authentik
         password: ${APP_AUTHENTIK_CNPG_PASSWORD}
