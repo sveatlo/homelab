@@ -51,17 +51,18 @@ spec:
     cnpg:
       main:
         enabled: true
+        mode: recovery
         user: babybuddy
         database: babybuddy
         password: ${APP_BABYBUDDY_CNPG_PASSWORD}
         backups:
           enabled: true
           credentials: backup
-          revision: "1"
+          revision: "2"
         recovery:
           enabled: true
           credentials: backup
-          revision: ""
+          revision: "1"
     ingress:
       main:
         enabled: true
