@@ -28,7 +28,7 @@ spec:
     cnpg:
       main:
         enabled: true
-        mode: recovery
+        mode: standalone
         database: mealie
         user: mealie
         password: ${APP_MEALIE_CNPG_PASSWORD}
