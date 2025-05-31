@@ -74,7 +74,7 @@ spec:
         httpConnection:
           protocol: https
           host: "${TRUENAS_IP}"
-          port: 444
+          port: 443
           apiKey: "${TRUENAS_API_KEY}"
           allowInsecure: true
         zfs:
