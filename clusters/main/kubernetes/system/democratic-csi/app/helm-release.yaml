@@ -58,7 +58,16 @@ spec:
           # if true, snapshots will be created with zfs send/receive
           detachedSnapshots: "true"
 
+    controller:
+      driver:
+        enabled: true
+        image:
+          registry: docker.io/democraticcsi/democratic-csi
+          tag: next
+
     driver:
+      image:
+        tag: next
       config:
         driver: freenas-api-nfs
         instance_id: "k8s-cluster"
