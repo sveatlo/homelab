@@ -6,3 +6,4 @@ resources:
   - external-service-jellyfin/ks.yaml
   - external-service-invoice-ninja/ks.yaml
   - external-service-firefly-iii/ks.yaml
+  - external-service-firefly-iii-importer/ks.yaml
