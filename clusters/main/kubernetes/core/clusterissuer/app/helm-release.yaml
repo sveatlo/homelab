@@ -57,6 +57,27 @@ spec:
           accessKeyID: "${DOMAIN_0_ROUTE53_ACCESS_KEY_ID}"
           route53SecretAccessKey: "${DOMAIN_0_ROUTE53_SECRET_ACCESS_KEY}"
 
+        - name: domain-1-le-staging
+          # Used for both logging in to the DNS provider AND ACME registration
+          email: "${DOMAIN_1_EMAIL}"
+          server: "https://acme-staging-v02.api.letsencrypt.org/directory"
+          # Options: HTTP01, cloudflare, route53, akamai, digitalocean, rfc2136, acmedns
+          type: "route53"
+          # for route53
+          region: "${DOMAIN_1_ROUTE53_REGION}"
+          accessKeyID: "${DOMAIN_1_ROUTE53_ACCESS_KEY_ID}"
+          route53SecretAccessKey: "${DOMAIN_1_ROUTE53_SECRET_ACCESS_KEY}"
+
+        - name: domain-1-le-prod
+          # Used for both logging in to the DNS provider AND ACME registration
+          email: "${DOMAIN_1_EMAIL}"
+          server: "https://acme-v02.api.letsencrypt.org/directory"
+          # Options: HTTP01, cloudflare, route53, akamai, digitalocean, rfc2136, acmedns
+          type: "route53"
+          # for route53
+          region: "${DOMAIN_1_ROUTE53_REGION}"
+          accessKeyID: "${DOMAIN_1_ROUTE53_ACCESS_KEY_ID}"
+          route53SecretAccessKey: "${DOMAIN_1_ROUTE53_SECRET_ACCESS_KEY}"
     ## Remove these if you do NOT want to use clusterissuer
     clusterCertificates:
       # Namespaces in which the certificates must be available
@@ -69,3 +90,9 @@ spec:
           hosts:
             - ${DOMAIN_0}
             - "*.${DOMAIN_0}"
+        - name: domain-1-wildcard
+          enabled: true
+          certificateIssuer: domain-1-le-prod
+          hosts:
+            - ${DOMAIN_1}
+            - "*.${DOMAIN_1}"
