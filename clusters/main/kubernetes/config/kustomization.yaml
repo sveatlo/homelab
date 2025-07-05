@@ -7,3 +7,4 @@ resources:
   - external-service-invoice-ninja/ks.yaml
   - external-service-firefly-iii/ks.yaml
   - external-service-firefly-iii-importer/ks.yaml
+  - external-service-nextcloud/ks.yaml
