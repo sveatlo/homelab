@@ -64,4 +64,4 @@ spec:
         mountPath: /media
         type: nfs
         server: ${TRUENAS_IP}
-        path: /mnt/tholos/media
+        path: /mnt/tank/media

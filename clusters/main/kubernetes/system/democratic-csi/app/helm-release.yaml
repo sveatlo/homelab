@@ -80,8 +80,8 @@ spec:
         zfs:
           datasetProperties:
             "org.freenas:description": "{{ parameters.[csi.storage.k8s.io/pvc/namespace] }}/{{ parameters.[csi.storage.k8s.io/pvc/name] }}"
-          datasetParentName: "tholos/k8s/volumes"
-          detachedSnapshotsDatasetParentName: "tholos/k8s/snapshots"
+          datasetParentName: "rapida/k8s/volumes"
+          detachedSnapshotsDatasetParentName: "rapida/k8s/snapshots"
           datasetEnableQuotas: true
           datasetEnableReservation: false
           datasetPermissionsMode: "0777"

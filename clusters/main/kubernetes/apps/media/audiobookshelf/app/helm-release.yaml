@@ -59,10 +59,10 @@ spec:
         mountPath: /audiobooks
         type: nfs
         server: ${TRUENAS_IP}
-        path: /mnt/tholos/media/Audio/Audio Books
+        path: /mnt/tank/media/Audio/Audio Books
       books:
         enabled: true
         mountPath: /books
         type: nfs
         server: ${TRUENAS_IP}
-        path: /mnt/tholos/media/E-books
+        path: /mnt/tank/media/E-books
