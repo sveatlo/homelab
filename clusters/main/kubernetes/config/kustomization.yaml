@@ -8,3 +8,4 @@ resources:
   - external-service-firefly-iii/ks.yaml
   - external-service-firefly-iii-importer/ks.yaml
   - external-service-nextcloud/ks.yaml
+  - external-service-n8n/ks.yaml
